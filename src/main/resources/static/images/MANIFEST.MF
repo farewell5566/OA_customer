@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: com.xc.springstudy.spring08.Spring08Application
+

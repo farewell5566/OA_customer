@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th=http://www.thymeleaf.org"">
+<head>
+    <meta charset="UTF-8">
+    <title>用户信息</title>
+
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+
+    <script th:src="@{/js/common/jquery-3.4.1.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+
+</head>
+<body>
+
+<!--导航栏 栏 下 -->
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+
+        <!--首页    ↓-->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/index">首页</a>
+        </div>
+
+        <!--首页  ↑-->
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+            <ul class="nav navbar-nav">
+                <li><a href="#">公文流转 <span class="sr-only">(current)</span></a>
+                </li>
+
+                <li class="dropdown ">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        人力资源 <span class="caret"></span>
+                    </a>
+
+                    <ul class="dropdown-menu">
+                        <li><a href="/account/list">人员列表</a></li>
+
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown ">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        系统设置 <span class="caret"></span>
+                    </a>
+
+                    <ul class="dropdown-menu">
+                        <li><a href="/manager/accountList">账号列表</a></li>
+                        <li><a href="/manager/roleList">角色管理</a></li>
+                        <li><a href="/manager/permissionList">权限管理</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+
+            <form class="navbar-form navbar-left">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="请输入搜索的ID或名字">
+                </div>
+                <button type="submit" class="btn btn-default">搜索</button>
+            </form>
+
+
+            <ul th:if="${session.account} == null" class="nav navbar-nav navbar-right">
+                <li><a href="/account/login">登陆</a></li>
+                <li><a href="/account/register">注册</a></li>
+            </ul>
+            <ul th:if="${session.account} != null" class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        欢迎你[[${session.account.loginName}]] <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/account/logout">退出登录</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<!--导航栏  ↑-->
+
+
+<h1>用户 权限 更改</h1>
+
+<form id="rolePerData">
+
+    ID： <input name="id" type="text" th:value="${role}==null?'':${role.id}"> <br>
+    用户名称： <input name="name" type="text" th:value="${role}==null?'':${role.name}"><br>
+
+    [[${role.permissions}]]
+    权限：
+    <span th:each="p:${permissions}">
+        <span th:each="rp:${role.permissions}">
+            <input type="checkbox" th:id="${p.id}" name="idData" th:value="${p.id}"
+                   th:hide="${rp.id} == ${p.id}?false :true" th:checked="${rp.id} == ${p.id}?false :true ">
+
+            <label th:text="${p.name}"></label>
+        </span>
+    </span>
+    <br>
+
+    <a class="btn btn-default" th:href="@{javascript:submit();}">提交</a>
+</form>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                是否确定删除该对象
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消操作</button>
+                <button type="button" class="btn btn-primary">确认删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function submit() {
+        var sendData = {};
+        var data = $("#rolePerData").serializeArray();
+        console.log(data);
+        $.each(data, function (i, item) {
+            sendData[item.name] = item.value
+        })
+
+        console.log(JSON.stringify(sendData));
+
+        var url = "/api/v1/manager/role/update"
+        $.post(url, data, function (data) {
+            console.log("success:" + JSON.stringify(data));
+
+        })
+        return;
+        $.ajax({
+            type: "post",
+            url: url,
+            contentType: "application/json",
+            data: JSON.stringify(sendData),
+            dataType: "json",
+            success: function (msg) {
+                console.log("success:" + JSON.stringify(msg));
+            },
+            error: function (msg) {
+                console.log("error: " + msg);
+            }
+        })
+
+    }
+
+
+    function modityByID(id) {
+        console.log(id);
+        var uri = "/manager/permissionModify";
+        var argus = {id: id}
+        $.post(uri, argus, function (data) {
+            console.log(data);
+        })
+    }
+
+
+    $(function () {
+        $('[data-toggle="popover"]').popover()
+    })
+
+    function deleteById(id) {
+        var uri = "/account/deleteById";
+        var argus = {id: id};
+        console.log("daozheli");
+        alert("请确定是否删除");
+        $.post(uri, argus, function (data) {
+            console.log(data);
+            if (data.statusCode == 200) {
+                console.log("操作成功");
+                window.location.reload();
+            } else {
+                console.log("操作失败");
+            }
+        })
+    }
+
+</script>
+
+</body>
+</html>
