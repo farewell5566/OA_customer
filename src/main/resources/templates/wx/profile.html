@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>wxProfile</title>
+</head>
+<body>
+<h1>这是微信的profile</h1>
+<h1>昵称：[[${session.user.nickname}]]</h1>
+头像：<img th:src="${session.user.headimgurl}">
+</body>
+</html>
+
+
+<!--
+use weixin.popular.bean.user.User@16901140
+[city=,country=中国,groupid=<null>,headimgurl=http://thirdwx.qlogo.cn/mmopen/vi_32/WlHqRUJ4Eaae6RIicEbycLZQ9MfcFn4iavgib4Pz6icgvn1vAbiam38r6QyBAWOwSx8yGCcOwAR1ZjCKibk9icQcaCIibQ/132,
+    language=zh_CN,nickname=星辰,nickname_emoji=<null>,openid=o2r8C1tiZqfKrdaRpAe_ZvPIhlV8,privilege={},province=北京,qr_scene=<null>,qr_scene_str=<null>,remark=<null>,sex=1,subscribe=<null>,
+        subscribe_scene=<null>,subscribe_time=<null>,tagid_list=<null>,unionid=<null>,errcode=<null>,errmsg=<null>]-->
